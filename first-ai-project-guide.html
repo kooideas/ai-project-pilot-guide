@@ -1,0 +1,1052 @@
+<title>First AI Project Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: gradient masthead, sticky seven-stage stepper, one stage at a time as a stack of question cards. */
+:root{
+  --display:"Outfit","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Public Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --bg:#F3F4F7; --surface:#FFFFFF; --ink:#1B1F27; --muted:#566070; --line:#DCE0E7;
+  --brand:#C8101B; --brand-ink:#FFFFFF; --brand-soft:#FDECEC;
+  --ok-solid:#17744B; --ok-ink:#FFFFFF; --ok-bg:#E4F3EB; --ok-text:#115A3A;
+  --help-solid:#8F5200; --help-ink:#FFFFFF; --help-bg:#FFF1D9; --help-text:#7A4600;
+  --focus:#1D5FD1;
+  --grad:linear-gradient(115deg,#B80E1A 0%,#D2301C 55%,#DE4A1A 100%);
+  --shadow:0 1px 2px rgba(20,24,32,.06),0 8px 24px rgba(20,24,32,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101216; --surface:#1A1D23; --ink:#ECEFF4; --muted:#A3AAB8; --line:#2C313A;
+    --brand:#FF6B5E; --brand-ink:#1E0A08; --brand-soft:#3A1B19;
+    --ok-solid:#4CC58A; --ok-ink:#0B2417; --ok-bg:#15301F; --ok-text:#8FE0B8;
+    --help-solid:#F2B04C; --help-ink:#2B1B00; --help-bg:#35280F; --help-text:#F5C97E;
+    --focus:#8DB8FF;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101216; --surface:#1A1D23; --ink:#ECEFF4; --muted:#A3AAB8; --line:#2C313A;
+  --brand:#FF6B5E; --brand-ink:#1E0A08; --brand-soft:#3A1B19;
+  --ok-solid:#4CC58A; --ok-ink:#0B2417; --ok-bg:#15301F; --ok-text:#8FE0B8;
+  --help-solid:#F2B04C; --help-ink:#2B1B00; --help-bg:#35280F; --help-text:#F5C97E;
+  --focus:#8DB8FF;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body);-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+.wrap{width:100%;max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* masthead */
+.top{background:var(--grad);color:#fff;padding-block:22px 18px}
+.kicker{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.92}
+.top h1{font-size:clamp(28px,6vw,40px);font-weight:700;line-height:1.1;margin-top:6px}
+.sub{margin-top:8px;font-size:16px;max-width:52ch;opacity:.96}
+.prog{margin-top:16px}
+.bar{height:8px;background:rgba(255,255,255,.3);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:#fff;border-radius:99px;transition:width .3s}
+.prog p{margin-top:8px;font-size:14px;font-variant-numeric:tabular-nums}
+.toprow{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;margin-top:14px}
+.tnav{display:flex;gap:8px;flex-wrap:wrap}
+.hlink{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:8px;padding:7px 12px;font-size:14px;font-weight:500}
+.hlink[aria-current="page"]{background:#fff;color:#A80D17;border-color:#fff}
+.pill{font-size:13px;display:inline-flex;align-items:center;gap:7px;opacity:.97}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#fff}
+.pill.local::before{background:transparent;border:2px solid #fff}
+
+/* stepper */
+.stepper{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.stepper ol{list-style:none;margin:0;padding:8px 0;display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+.stepper li{flex:1 0 52px;min-width:0}
+.step{width:100%;background:none;border:0;padding:4px 0;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted)}
+.dot{--p:0%;width:34px;height:34px;border-radius:50%;position:relative;background:conic-gradient(var(--ok-solid) var(--p),var(--line) 0)}
+.dot b{position:absolute;inset:3px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font:600 13px/1 var(--display);color:var(--ink)}
+.step.done .dot b{background:var(--ok-solid);color:var(--ok-ink)}
+.step[aria-current="step"] .dot b{background:var(--brand);color:var(--brand-ink)}
+.step[aria-current="step"]{color:var(--ink);font-weight:600}
+.lbl{display:none;font-size:12px;line-height:1.2;text-align:center;max-width:64px}
+@media (min-width:720px){.lbl{display:block}}
+
+/* content */
+main{padding-block:24px 8px;display:flex;flex-direction:column;gap:24px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-size:clamp(24px,4.5vw,30px);font-weight:600;line-height:1.15}
+h3{font-size:18px;font-weight:600;line-height:1.3}
+.lead{margin-top:10px;max-width:68ch}
+.muted{color:var(--muted)}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.note-box{margin-top:12px;background:var(--brand-soft);border-radius:10px;padding:12px 14px;font-size:15px;max-width:68ch}
+.ready{margin-top:12px;font-size:15px;max-width:68ch}
+.srcline{margin-top:10px;font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:6px 12px;font-size:14px}
+button.chip[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);font-weight:600}
+.tag{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--muted)}
+.tag.on{border-color:var(--brand);color:var(--brand);font-weight:600}
+.btn{background:var(--brand);color:var(--brand-ink);border:1px solid var(--brand);border-radius:8px;padding:11px 18px;font-weight:600}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.linkbtn{background:none;border:0;padding:0;color:var(--brand);text-decoration:underline;font-size:inherit}
+.rolebar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between;font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+
+.stage-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}
+.srow{width:100%;text-align:left;display:grid;grid-template-columns:36px 1fr;gap:4px 14px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.srow .n{grid-row:span 3;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font:600 15px/1 var(--display);background:var(--bg);border:1px solid var(--line)}
+.srow.done .n{background:var(--ok-solid);color:var(--ok-ink);border-color:var(--ok-solid)}
+.srow .t{font:600 17px/1.25 var(--display)}
+.srow .s{font-size:14px;color:var(--muted)}
+.mini{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:4px}
+.mini i{display:block;height:100%;background:var(--ok-solid)}
+.cnt{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.items{display:flex;flex-direction:column;gap:12px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.item[data-s="done"]{background:var(--ok-bg);border-color:var(--ok-solid)}
+.item[data-s="help"]{background:var(--help-bg);border-color:var(--help-solid)}
+.item .q{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline}
+.idx{font:600 14px/1 var(--display);color:var(--muted);font-variant-numeric:tabular-nums}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{background:transparent;border:0;border-left:1px solid var(--line);padding:10px 4px;font-size:14px;font-weight:500;color:var(--ink)}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"][data-v="open"]{background:var(--line);font-weight:600}
+.seg button[aria-pressed="true"][data-v="done"]{background:var(--ok-solid);color:var(--ok-ink);font-weight:600}
+.seg button[aria-pressed="true"][data-v="help"]{background:var(--help-solid);color:var(--help-ink);font-weight:600}
+.seg button:disabled{cursor:default;opacity:.7}
+details summary{cursor:pointer;font-weight:600;font-size:15px;color:var(--brand);list-style:none;display:flex;align-items:center;gap:8px}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"+";display:inline-grid;place-items:center;width:20px;height:20px;border:1px solid currentColor;border-radius:50%;font-size:14px;line-height:1}
+details[open] summary::before{content:"\2212"}
+.dotnote{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.body{margin-top:12px;display:flex;flex-direction:column;gap:12px;font-size:15px}
+.block h4{font:600 12px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.body label{font-size:13px;font-weight:600;color:var(--muted)}
+textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;resize:vertical;min-height:72px}
+.meta{font-size:12px;color:var(--muted)}
+.pager{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
+.pager .btn{flex:1 1 180px}
+.helplist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.hl{display:flex;gap:10px;align-items:baseline;justify-content:space-between;background:var(--help-bg);border:1px solid var(--help-solid);border-radius:8px;padding:10px 12px;text-align:left;width:100%}
+.hl span:first-child{min-width:0}
+.search{width:100%;margin-top:12px;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+dl{margin:12px 0 0;display:grid;gap:12px}
+dt{font:600 17px/1.3 var(--display)}
+dd{margin:2px 0 0;font-size:15px}
+dd .meta{display:block;margin-top:2px}
+ul.plain{margin:10px 0 0;padding-left:20px;display:grid;gap:6px}
+footer{padding-block:20px 40px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);margin-top:24px}
+footer a{color:var(--brand)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;max-width:min(90vw,420px);z-index:20;box-shadow:var(--shadow)}
+@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+
+/* path chooser and sources */
+.paths{display:grid;gap:10px;margin-top:12px}
+@media (min-width:720px){.paths{grid-template-columns:repeat(3,1fr)}}
+.pathcard{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;color:var(--ink)}
+.pathcard .t{font:600 17px/1.25 var(--display)}
+.pathcard .s{font-size:14px;color:var(--muted)}
+.pathcard[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft)}
+.pathcard[aria-pressed="true"] .t::before{content:"\2713  ";color:var(--brand)}
+.pathcard:disabled{opacity:.7;cursor:default}
+.tag.bey{background:var(--brand-soft);color:var(--brand);border-color:var(--brand-soft);font-weight:600}
+ul.srcs{margin:4px 0 0;padding-left:18px;display:grid;gap:4px;font-size:14px}
+ul.srcs a,.meta a{color:var(--brand)}
+</style>
+
+<div id="app">
+  <header class="top"><div class="wrap" id="masthead"></div></header>
+  <nav class="stepper" aria-label="Stages"><div class="wrap"><ol id="stepper"></ol></div></nav>
+  <div class="wrap">
+    <main id="main"></main>
+    <footer>
+      Content adapted from AI Singapore’s <a href="https://aisingapore.github.io/ai-practitioner-handbook/" target="_blank" rel="noopener">AI Practitioner Handbook</a> (24 March 2023), edited by Kenny WJ Chua, Ryzal Kamis, Siavash Sakhavi, Anand Natarajan, Kevin Oh, Najib Ninaba, Kim Hock Ng and Laurence Liew. Section marks such as §1.3 refer to the handbook’s numbering. Wording is condensed and simplified for this guide. Items marked “Beyond the handbook” go further than the handbook to cover generative AI. They draw on the linked public sources, which were checked on 20 October 2026. Guidance changes quickly, so check the source before relying on it. This is not legal advice.
+    </footer>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+var ROLES={biz:"Business lead",data:"Data owner",tech:"Technical lead"};
+
+var HB_STAGES=[
+{
+ id:"frame",tab:"Frame",title:"Frame the problem",
+ short:"Turn a business challenge into a problem a team can build for",
+ src:"§1.2, §1.4",
+ intro:"Business leaders usually describe problems at a high level. This stage gets down to who feels the problem day to day, then translates it into what an AI system would actually have to do.",
+ ready:"You can state the problem in one sentence and say which task the AI would take over.",
+ items:[
+ {id:"f1",q:"Who feels this problem day to day?",roles:["biz"],
+  why:"The AI will usually take over a repetitive task that specific employees face every day, so start from them rather than from the management view.",
+  watch:"Name the target user (for example an employee or a customer) and describe the pain point in their words.",
+  tech:"AI Singapore uses ideas from Design Thinking and the Design Sprint to map this out.",src:"§1.2.1"},
+ {id:"f2",q:"When and where does the problem happen, and what is gained by solving it?",roles:["biz"],
+  why:"Knowing the moment the problem occurs shows what the system must plug into. You also need the benefit to the person and the value to the business.",
+  watch:"Write down both: what gets easier for the person, and what improves for the business.",src:"§1.2.1"},
+ {id:"f3",q:"Can you state it as a “How might we…?” question?",roles:["biz","tech"],
+  why:"One sentence keeps everyone aiming at the same target.",
+  watch:"The handbook’s hypothetical example: “How might we build an AI model to count cells on microscopy images?”",src:"§1.2.1"},
+ {id:"f4",q:"What is the main task you want to replace or speed up?",roles:["biz","tech"],
+  why:"This tells the team what the AI has to automate.",
+  tech:"In the handbook’s example the task becomes an AI model that detects cells by size.",src:"§1.2.2"},
+ {id:"f5",q:"What kind of data is involved: images, video, text, tables of numbers, or a mix?",roles:["data","tech"],
+  why:"The type of data narrows down which kind of AI is suitable.",
+  tech:"Image, video, text, tabular and multimodal data point to different AI domains and models.",src:"§1.2.2"},
+ {id:"f6",q:"What exactly should the output look like, and who receives it?",roles:["biz","tech"],
+  why:"How the business needs results returned shapes which algorithm is chosen and how examples are labelled.",
+  tech:"In the handbook’s example the output is masks drawn around detected cells with their sizes estimated, which points to a computer-vision instance segmentation model.",src:"§1.2.2"},
+ {id:"f7",q:"Could simple rules or a spreadsheet formula handle part or all of this?",roles:["biz","tech"],
+  why:"Using machine learning on a problem that a simple rule can solve can be costly and reckless. Using it to replace repetitive work where labour is short is a deliberate choice with long-term benefits.",
+  watch:"Ask the team whether rules should sit alongside the AI model to reach the outcome you need.",
+  tech:"Rule-based steps can be combined with the model, for example converting pixel measurements into real sizes.",src:"§1.2.2, §1.4.3"},
+ {id:"f8",q:"How will the AI fit into your daily process?",roles:["biz","tech"],
+  why:"You need to know which applications it connects to, how often it will run and how much human involvement remains.",
+  tech:"Expect to sketch a high-level application architecture and list the infrastructure it needs.",src:"§1.2.2"}
+ ]
+},
+{
+ id:"data",tab:"Data",title:"Check your data",
+ short:"Four key questions, plus privacy and data-quality checks",
+ src:"§1.3, §5.3, §5.10",
+ intro:"A good AI model depends on quality data as much as on algorithms. The handbook suggests four key questions before a project starts. They are written with supervised learning in mind, and most also apply to other approaches.",
+ ready:"You have looked at a sample of your real data and know where the gaps are.",
+ items:[
+ {id:"d1",q:"Is the thing you want to predict clearly defined, and do you have examples of the right answer?",roles:["biz","data"],
+  why:"The target must relate to a business outcome, such as reducing repetitive tasks or prioritising patients for treatment. Without a clear definition, quality labels can’t be defined.",
+  watch:"If the target is hard to state, go back to the problem statement in stage 1.",
+  tech:"If one outcome is very rare (for example 5% positive and 95% negative), consider reframing as anomaly detection. If a numeric target only takes a few fixed values, consider reframing as classification.",src:"§1.3.1"},
+ {id:"d2",q:"If a person did this task, what information would they use, and will you have it when the system runs?",roles:["biz","data"],
+  why:"The data must contain features that can predict the target, available both for training and during real use.",
+  watch:"Check with a small, representative sample. If the data doesn’t support what your experts believe, noise or a hidden third factor may be involved, so investigate before dismissing either.",
+  tech:"“Signal” means enough relevant information; “variance” means enough range and diversity. For images and text, run a pretrained model on a sample or inspect it by eye. For tables, plot correlation or mutual information against the target.",src:"§1.3.1"},
+ {id:"d3",q:"Is your data recorded at the level of detail you need?",roles:["data","tech"],
+  why:"If you want hourly predictions but only collect daily data, the model can’t deliver them. Predictions at the same or a coarser level than the data are possible.",
+  watch:"Count what you really have: 86,400 per-second readings in a day become only 24 hourly values if hourly is what you need.",
+  tech:"Training and production data should share the granularity your sponsor expects in the prediction.",src:"§1.3.1"},
+ {id:"d4",q:"Does the data you will train on look like what the system will see in real life?",roles:["data","biz"],
+  why:"If training data leans towards one outcome or group, the model will be good at that and poor at the rest, and is more likely to drift soon after going live.",
+  watch:"Pick a few defining attributes (for example age group, or object size in images), estimate their share in your real-world data, and make the training data match.",
+  tech:"Unrepresentative data leads to unintended bias and weak robustness.",src:"§1.3.1"},
+ {id:"d5",q:"Have you checked for missing values, duplicates and obvious errors?",roles:["data","tech"],
+  why:"Missing or wrong values need a decision: drop, repair or fill in. Duplicates can cause data leakage when data is later split for training and testing.",
+  watch:"Ask why values are missing before filling them in; the reason affects the method.",
+  tech:"Types of missingness: MCAR, MAR and MNAR. Fill-in options: a fixed value from domain knowledge, a statistical summary, model-based or multiple imputation.",src:"§5.3.2–5.3.3"},
+ {id:"d6",q:"Does the data include personal or sensitive information, and have you agreed how to handle it?",roles:["data","biz"],
+  why:"Sensitive data may need masking or removal. Anonymising helps stop personal identifiable information leaking, as required under Singapore’s Personal Data Protection Act.",
+  watch:"Anonymising alone does not protect your proprietary data.",
+  tech:"Discuss masking or removal with stakeholders, and decide deliberately what to do with duplicate rows.",src:"§5.3.2, §5.10.3"},
+ {id:"d7",q:"Do you know where the data came from and who can change it?",roles:["data","tech"],
+  why:"Data collected from untrusted sources can be deliberately manipulated (data poisoning), which can compromise the model.",
+  watch:"Limit who can access raw and processed data, record how it was generated, collected and assembled, and check how labels were made and validated.",
+  tech:"For sensor data, regular recalibration or overlapping sensors help reliability. Don’t use data blindly: look for inconsistencies in value ranges and frequencies.",src:"§5.10"}
+ ]
+},
+{
+ id:"ready",tab:"Readiness",title:"Check your readiness",
+ short:"Can your organisation take over and run the solution?",
+ src:"§1.5",
+ intro:"The handbook names three common reasons AI projects fail at deployment: technical hurdles in fitting the model into existing operations, decision makers unwilling to approve changes, and performance judged not strong enough. These questions test readiness on three fronts: organisation, infrastructure and data.",
+ note:"AI Singapore’s AI Readiness Index (AIRI) looks at five areas (organisational, infrastructure, data, business value, and ethics and governance) and places organisations as AI Unaware, Aware, Ready or Competent. This stage covers the technical side only; use AIRI for a fuller assessment.",
+ ready:"You know who runs this after launch, and where your gaps are.",
+ items:[
+ {id:"r1",q:"Who will integrate and maintain the model after it is built?",roles:["biz","tech"],
+  why:"Someone has to plug the solution into existing systems and keep it working.",
+  watch:"If you have no technical team, decide now how you will hire or contract the skills.",src:"§1.5.3"},
+ {id:"r2",q:"Does management back AI projects, including growing the team if needed?",roles:["biz"],
+  why:"Without leadership support, the resources to build and maintain the model are unlikely to follow.",src:"§1.5.3"},
+ {id:"r3",q:"Is there room to experiment?",roles:["biz"],
+  why:"Model building and maintenance need iterative experimentation and continuous retraining. Management should understand this and support the right resources.",src:"§1.5.3"},
+ {id:"r4",q:"Is your data kept in one central, standard place, or spread across individual files?",roles:["data","tech"],
+  why:"A central store such as a data warehouse is easier to maintain than scattered file systems.",
+  watch:"If it is spread out, discuss what it would take to bring it together.",src:"§1.5.3"},
+ {id:"r5",q:"Do you have enough computing power to run and maintain the model?",roles:["tech"],
+  why:"Deployment and upkeep need enough processors, graphics processors and memory.",
+  watch:"If not, are there plans to buy more or re-allocate what you have?",src:"§1.5.3"},
+ {id:"r6",q:"Is your data consistent, with up-to-date notes on what each field means?",roles:["data"],
+  why:"A consistent format, current metadata and a single source of truth make data usable.",src:"§1.5.3"},
+ {id:"r7",q:"Is the data accurate and complete enough for this project, and will it stay that way?",roles:["data"],
+  why:"You will need high-quality, consistent data to retrain the model when it drifts over time.",src:"§1.5.3"},
+ {id:"r8",q:"Will the people who approve changes to how you work say yes?",roles:["biz"],
+  why:"One of the three common reasons for failure at deployment is decision makers unwilling to approve changes to existing operations.",
+  watch:"Involve them early and show them what “good enough” looks like (see stage 5).",src:"§1.5.2"},
+ {id:"r9",q:"Will they judge the model’s performance to be strong enough?",roles:["biz","tech"],
+  why:"Another common reason for failure: decision makers consider the model’s performance not strong enough.",
+  watch:"Agree how performance will be measured, and what counts as acceptable, before you build (see stage 5).",src:"§1.5.2"}
+ ]
+},
+{
+ id:"store",tab:"Storage",title:"Choose where data lives",
+ short:"Pick storage your team can actually support",
+ src:"§5.2, §3.2.3",
+ intro:"There is no single right answer. The handbook suggests weighing three things: your team’s data skills, how reliable and consistent the data must be, and how much complexity you can manage.",
+ ready:"You have agreed a storage approach that everyone can support.",
+ items:[
+ {id:"st1",q:"How comfortable is your team with data today?",roles:["biz","data"],
+  why:"Analyst skills vary widely, from simple Excel data entry to highly automated processes. Willingness to adopt something outside their comfort zone matters too.",
+  watch:"For small data used internally and occasionally, CSV or Excel files may be enough. If data comes from many sources, a data lake feeding a data warehouse may suit better.",src:"§5.2.1"},
+ {id:"st2",q:"Does everyone need to work from the same, latest data?",roles:["data","tech"],
+  why:"With flat files such as CSV or Excel, different people can end up using different versions, which gives unreliable and inconsistent results.",
+  watch:"If freshness and consistency matter, look at database systems, relational or non-relational.",
+  tech:"Examples named in the handbook include SQL and MongoDB.",src:"§5.2.2"},
+ {id:"st3",q:"Can you afford and support what you choose?",roles:["biz","tech"],
+  why:"“Cost” can mean money, the time to learn new skills, or security and privacy risk. Weigh self-hosting against managed cloud, and ask whether the data is sensitive enough to keep in-house.",
+  watch:"Plan for the long term too, so you don’t have to rebuild later.",src:"§5.2.3"},
+ {id:"st4",q:"How will you keep track of which data produced which model?",roles:["tech"],
+  why:"As experiments pile up, it gets hard to trace a model back to the data it was trained on.",
+  watch:"Keep datasets and model files in shared storage, not in the code repository. Even a shared spreadsheet recording model, weights and dataset versions pays off.",
+  tech:"Tools named in the handbook: MLflow and Weights &amp; Biases for tracking experiments and models; DVC and neptune.ai for data versions.",src:"§3.2.3"}
+ ]
+},
+{
+ id:"good",tab:"Success",title:"Decide what “good” means",
+ short:"Agree how success is measured before anything is built",
+ src:"§6.2, §6.4–6.5, §6.11, §4.2.5",
+ intro:"“The model is 95% accurate” can mean very little. Agree on measures that reflect business cost, set acceptable limits on speed and size, and know how results will be explained.",
+ ready:"You can say which number would make you satisfied and which limits it must stay within.",
+ items:[
+ {id:"g1",q:"Which hurts more: missing a real case, or raising a false alarm?",roles:["biz"],
+  why:"If false alarms are costly, favour precision. If misses are costly, favour recall. If both matter equally, use F1, or an F-beta score when one matters more.",
+  watch:"Check with your sponsor or client which cost is higher; it changes which model looks best.",
+  tech:"Precision: of the model’s positive predictions, how many are correct. Recall: of all actual positives, how many the model found.",src:"§6.5.2"},
+ {id:"g2",q:"Is plain accuracy misleading for your problem?",roles:["tech","data"],
+  why:"In a fraud problem where 5% of cases are fraudulent, a model that calls everything non-fraud scores 95% accuracy and catches nothing.",
+  watch:"When one outcome is rare, ask for precision, recall and F1 as well.",
+  tech:"For imbalanced data the handbook prefers the precision-recall curve to ROC and AUC, which can look good even when precision is low.",src:"§6.5.2"},
+ {id:"g3",q:"What speed, size and cost limits must the model stay within?",roles:["biz","tech"],
+  why:"Beyond accuracy, practical limits such as run time, training time and memory matter, especially on small devices.",
+  watch:"Don’t chase tiny accuracy gains at disproportionate cost: an improvement of 0.0001 may need much longer, pricier computing.",
+  tech:"Agree an acceptable threshold for the limit (the “satisficing” metric), then maximise the main metric within it.",src:"§6.2.3–6.2.4"},
+ {id:"g4",q:"Does your team understand the measures being reported?",roles:["biz"],
+  why:"Stakeholders should be comfortable with the metrics so they can communicate results, and later teams can improve the model.",src:"§6.2.1"},
+ {id:"g5",q:"Do you need to explain individual decisions?",roles:["biz","tech"],
+  why:"Stakeholders increasingly ask, sometimes under legal requirements, how a model reached a decision, for example why a bank loan was rejected.",
+  watch:"Decide upfront whether you need a model that can be read directly, or a more powerful one that is explained after the fact.",
+  tech:"Glass-box models give exact explanations built in. Black-box models need extra analysis (such as SHAP or permutation importance) and give approximate explanations that can vary between runs.",src:"§6.11"},
+ {id:"g6",q:"How will the model be tested on unexpected inputs?",roles:["tech"],
+  why:"A model that fails on unexpected inputs is unreliable. The handbook’s example is a road-sign model misreading a stop sign.",
+  watch:"Robustness testing shows where a model fails and lets you compare versions. It does not prove a model is robust.",
+  tech:"Covers adversarial examples and out-of-distribution data. Tools named: IBM ART, TextAttack and Microsoft CheckList.",src:"§6.4"},
+ {id:"g7",q:"Will quoted results hold up on your data?",roles:["biz","tech"],
+  why:"Results reported in papers or sales material may be cherry-picked and come from different data, so expect different accuracy on yours.",
+  watch:"Focus on how the result was evaluated and which method was used, not just the headline number.",src:"§4.2.5"},
+ {id:"g8",q:"Is test data kept apart, and free of leaks?",roles:["tech"],
+  why:"Data held back for final testing must not influence modelling decisions, otherwise results look better than real life.",
+  watch:"Ask how the data was split. Forecasting problems need time-based splits so future data doesn’t predict the past, and near-duplicate records must not straddle the training and test sets.",
+  tech:"Strategies include static, cross-validation, stratified and temporal splits. A repeatable, hash-based split keeps experiments reproducible.",src:"§5.5–5.7"}
+ ]
+},
+{
+ id:"deploy",tab:"Deploy",title:"Plan deployment",
+ short:"Pin down where and how it will run",
+ src:"§7.2",
+ intro:"Ask these early, because the answers can change effort and schedule. If your environment is fixed, share the specifications as soon as possible so the team can check the solution will run there.",
+ ready:"You have told the team where it runs and what it connects to.",
+ items:[
+ {id:"p1",q:"Where will it run: the cloud, your own server, or a device?",roles:["tech"],
+  why:"If the specifications are fixed, the team needs them early to assess whether they are sufficient for the AI solution.",src:"§7.2.1"},
+ {id:"p2",q:"How must it be packaged, and are there limits on tools such as containers?",roles:["tech"],
+  why:"Some organisations restrict or ban containerisation. That can add effort, such as more integration testing, and affect the schedule.",src:"§7.2.1"},
+ {id:"p3",q:"Are there rules on operating systems or software licences?",roles:["tech","biz"],
+  why:"Many open-source libraries use permissive licences (Apache 2.0, MIT, BSD). Less permissive ones, such as the GPL, may not be usable in a commercial project.",
+  watch:"If the solution needs a less permissive licence, check with the client first.",src:"§7.2.1, §4.2.3"},
+ {id:"p4",q:"Will you provide a test environment before go-live?",roles:["tech"],
+  why:"Without one, the team has to set up an internal environment that mirrors yours.",src:"§7.2.1"},
+ {id:"p5",q:"Where will training and live data sit, where do outputs go, and how is access controlled?",roles:["data","tech"],
+  why:"These affect how the system is built. Check for storage size limits and, for remote storage, the method of authentication.",src:"§7.2.2"},
+ {id:"p6",q:"How often will it run, and with how much data at a time?",roles:["biz","tech"],
+  why:"Running predictions (inference) is usually more time-critical than retraining, which happens less often.",
+  watch:"Say whether batch processing is needed, and the expected size of a batch.",src:"§7.2.3"},
+ {id:"p7",q:"What speed, training time and model size can you live with?",roles:["tech","biz"],
+  why:"The device you deploy on may limit what is possible, and adjusting the code to fit adds effort.",src:"§7.2.3"},
+ {id:"p8",q:"Must it connect to other systems, and in what format?",roles:["tech"],
+  why:"Decide whether the application acts as server or client, which type of API to support and what the data payload looks like.",
+  watch:"Payload size can affect speed, so benchmark with sample files. If no API is needed, agree how users will trigger the system.",src:"§7.2.4"}
+ ]
+},
+{
+ id:"handover",tab:"Handover",title:"Hand over and keep it running",
+ short:"Make sure it can be understood, maintained and retrained",
+ src:"§8.2, §1.4, §6.3, §5.10",
+ intro:"A model that works at handover can still decay, or become impossible to maintain. These questions cover documentation, upkeep and the shortcuts that cost more later.",
+ ready:"You know who looks after the system, and how.",
+ items:[
+ {id:"h1",q:"Will you receive the code and instructions to retrain the model?",roles:["biz","tech"],
+  why:"The handbook’s plain-language example: the vendor shares code and instructions with your technical team so they can refresh the model once the solution is running and you have gathered enough new data.",src:"§2.5.2"},
+ {id:"h2",q:"Is the system documented with simple, consistent diagrams?",roles:["tech"],
+  why:"Box-and-arrow diagrams are easy to maintain. Use one diagram per process, the same shapes throughout, and a label on every element and relationship.",
+  watch:"For general users a high-level context diagram usually suffices. Technical readers may need lower levels, which are best generated automatically because they go out of date.",
+  tech:"The handbook recommends the C4 model: context, container, component and code.",src:"§8.2"},
+ {id:"h3",q:"Who will watch for the model getting worse over time?",roles:["biz","tech"],
+  why:"Real-world data changes, so a model can drift. Retraining needs consistent, good-quality data.",
+  watch:"Agree who monitors real-world performance and what triggers retraining.",src:"§1.4.4, §1.5.3, §5.9.5"},
+ {id:"h4",q:"Could someone else rebuild the same model from your code and data?",roles:["tech"],
+  why:"Reproducible models are more reliable and easier to hand over.",
+  tech:"Pin library versions, fix random seeds, version models and log parameters and environment. Some randomness (for example on GPUs) can’t be removed entirely.",src:"§6.3"},
+ {id:"h5",q:"Is regular time set aside for fixing shortcuts?",roles:["biz","tech"],
+  why:"Shortcuts taken for speed accrue “interest” and make later changes more expensive.",
+  watch:"A useful test: how quickly could a new team member get up to speed?",
+  tech:"The handbook’s best-practice list includes setting aside regular, non-negotiable time for dealing with technical debt.",src:"§1.4"},
+ {id:"h6",q:"What can the AI decide on its own, and what needs a person?",roles:["biz"],
+  why:"The handbook’s best-practice list includes putting limits on the real-world decisions that machine-learning systems can make.",src:"§1.4.4"},
+ {id:"h7",q:"Is the model protected against misuse?",roles:["tech","data"],
+  why:"A person with unlimited access can probe a model to learn about the data it was trained on.",
+  watch:"Return only the outputs users need (no confidence scores unless necessary), limit how many queries a user can make, and control access to the data.",src:"§5.10"}
+ ]
+}
+];
+
+/* ---------- Beyond the handbook: generative AI ---------- */
+var SRC={
+ imda:{t:"IMDA and AI Verify Foundation: Model AI Governance Framework for Generative AI (final, 30 May 2024)",u:"https://aiverifyfoundation.sg/?p=10545"},
+ agentic:{t:"Allen & Gledhill: IMDA updates Model AI Governance Framework for Agentic AI (law-firm summary)",u:"https://www.allenandgledhill.com/sg/publication/articles/33285/imda-updates-model-ai-governance-framework-for-agentic-ai"},
+ pdpc:{t:"PDPC: Advisory Guidelines on Use of Personal Data in AI Recommendation and Decision Systems",u:"https://pdpc.gov.sg/guidelines-and-consultation/2024/02/advisory-guidelines-on-use-of-personal-data-in-ai-recommendation-and-decision-systems"},
+ csa:{t:"CSA: Guidelines and Companion Guide on Securing AI Systems (15 Oct 2024)",u:"https://www.csa.gov.sg/resources/publications/guidelines-and-companion-guide-on-securing-ai-systems/"},
+ owasp:{t:"HackerOne: OWASP Top 10 for LLM Applications 2025 (summary)",u:"https://www.hackerone.com/ai/owasp-top-10-llms-2025"},
+ owaspPI:{t:"OWASP GenAI Security Project: LLM01 Prompt Injection",u:"https://genai.owasp.org/llmrisk/llm01-prompt-injection/"},
+ starter:{t:"IMDA: Starter Kit for Testing LLM-based Applications for Safety and Reliability",u:"https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/starter-kit-for-testing-llm-based-applications-for-safety-and-reliability.pdf"},
+ nist:{t:"NIST: AI Risk Management Framework, Generative AI Profile (AI 600-1, 26 Jul 2024)",u:"https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence"},
+ iso:{t:"ISO/IEC 42001:2023, AI management system",u:"https://www.iso.org/standard/81230.html"},
+ dora:{t:"Google: 2025 DORA State of AI-assisted Software Development report",u:"https://blog.google/technology/developers/dora-report-2025/"},
+ kiro:{t:"Kiro documentation: Specs",u:"https://kiro.dev/docs/specs/"},
+ deprec:{t:"Anthropic: Model deprecations",u:"https://platform.claude.com/docs/en/about-claude/model-deprecations"},
+ aircan:{t:"McCarthy Tétrault: Moffatt v. Air Canada, misrepresentation by an AI chatbot (Feb 2024)",u:"https://www.mccarthy.ca/en/insights/blogs/techlex/moffatt-v-air-canada-misrepresentation-ai-chatbot"}
+};
+
+var GEN_STAGES=[
+{
+ id:"fit",tab:"GenAI fit",title:"Decide if and how to use generative AI",beyond:true,paths:["use"],
+ short:"Pick tasks that suit tools like Claude, ChatGPT or Copilot, and who stays accountable",
+ intro:"General-purpose assistants can draft, summarise, search and write code, so starting is easy and so is misuse. This stage asks whether the task suits them, how much to build, and who answers for the result.",
+ ready:"You can name the task, the person accountable for it, and whether you will use a tool as it is, configure it, or build on it.",
+ items:[
+ {id:"g1",q:"Which task will the tool take over, and who stays accountable for the result?",roles:["biz"],
+  why:"A tool cannot be held to account, so a named person has to be. Singapore’s generative AI framework lists accountability as its first dimension: players in the AI lifecycle should be answerable to end-users. In Moffatt v. Air Canada (2024 BCCRT 149), the airline argued its chatbot was a separate entity responsible for its own actions. The tribunal rejected that and found the chatbot is part of the website, so the airline is responsible for all the information on it.",
+  watch:"Write one owner next to each AI-assisted task. Customer-facing answers need the clearest owner.",l:["imda","aircan"]},
+ {id:"g2",q:"If the tool gets it wrong, is that cheap or costly?",roles:["biz","tech"],
+  why:"Fluent output can still be wrong or made up. IMDA’s testing starter kit lists hallucination and inaccuracy as a risk: outputs that are wrong or fabricated, for example relative to company policy.",
+  watch:"Begin where a person can check the result quickly, such as drafting or summarising their own material. Move to tasks where errors reach customers only after you have tested them.",l:["starter"]},
+ {id:"g3",q:"Is this a task for a tool as it is, a configured tool, or something you build?",roles:["biz","tech"],
+  why:"There are roughly three levels. Use an assistant as it comes. Configure it with your own instructions, documents or connections. Build a custom application, or train a model. Each step up adds cost, risk and upkeep.",
+  watch:"Choose the lightest level that does the job, and write down why you moved up if you did.",
+  tech:"Configuring typically means saved instructions, a document library or retrieval over company files, and connectors to other systems. Building means calling a model through an API or training one."},
+ {id:"g4",q:"Have you tried the task on real examples from your own work?",roles:["tech","data"],
+  why:"Demos on clean examples flatter the tool. Your messy real cases show whether it is worth adopting.",
+  watch:"Use a small set of real, anonymised cases, including awkward ones and ones the tool should decline."},
+ {id:"g5",q:"Does the task need the AI to take actions, or only to write text?",roles:["tech","biz"],
+  why:"Once a tool can send messages, change records or call other systems it behaves as an agent. IMDA’s agentic AI framework, launched in January 2026 and updated in May 2026, states that humans are ultimately accountable, and the update covers multi-agent systems, third-party agents and automation bias. OWASP names “excessive agency” (too much functionality, permission or autonomy) as a top LLM risk.",
+  watch:"Start read-only. Add each action, such as send or update, one at a time with a person approving it.",l:["agentic","owasp"]},
+ {id:"g6",q:"What will you not use it for?",roles:["biz"],
+  why:"Clear limits are easier to follow than general caution.",
+  watch:"List a few out-of-scope uses, such as final legal wording, decisions about individuals, or anything involving data you have not cleared."}
+ ]
+},
+{
+ id:"custom",tab:"Custom model",title:"Check whether you need to train a model",beyond:true,paths:["build"],
+ short:"Test a general model first, then settle data rights, tampering risk and responsibility",
+ intro:"The handbook assumes you will train a model. Today a general-purpose LLM may already do the job, so prove it cannot before paying to train something.",
+ ready:"You have a baseline from a general model, and a reason, written down, for needing anything more.",
+ items:[
+ {id:"c1",q:"Have you tried a general LLM on this task first?",roles:["tech","biz"],
+  why:"A prompted general model gives you a quick baseline for quality and cost. A custom model has to beat it to justify the effort.",
+  watch:"Record the baseline result on your real cases before starting any training work."},
+ {id:"c2",q:"Do you need to teach the model new skills, or only give it your facts?",roles:["tech"],
+  why:"Supplying your documents at question time is different from changing the model itself. The first is lighter and easier to update; the second is for behaviour that prompting cannot reach.",
+  watch:"Ask your technical lead or vendor which one the problem calls for, and why.",
+  tech:"Retrieval over your documents (often called RAG) versus fine-tuning. Note that OWASP says neither retrieval nor fine-tuning fully prevents prompt injection."},
+ {id:"c3",q:"Do you have the right to use the training data?",roles:["data","biz"],
+  why:"Singapore’s generative AI framework has a data dimension: ensure data quality and handle contentious training data pragmatically. PDPC’s advisory guidelines address using personal data to train or develop AI systems.",
+  watch:"Check licences, customer consent and personal data before the data is used to train anything.",l:["imda","pdpc"]},
+ {id:"c4",q:"Could the training data or the base model have been tampered with?",roles:["tech"],
+  why:"OWASP lists supply-chain risks (compromised pre-trained models, third-party data, unvetted packages) and data and model poisoning, where tampering introduces backdoors, bias or other flaws. The handbook covers data poisoning in §5.10.",
+  watch:"Use models and data from sources you can identify, and keep a record of what you used.",l:["owasp","csa"],src:"§5.10"},
+ {id:"c5",q:"Who is responsible for what when you build on someone else’s model?",roles:["biz","tech"],
+  why:"A base-model supplier, a vendor and your company each play a part. PDPC’s guidelines discuss the obligations of third-party AI developers who may act as data intermediaries.",
+  watch:"Put responsibilities for data, testing and incidents in the contract, not just the pricing.",l:["pdpc","imda"]},
+ {id:"c6",q:"How will you compare the custom model with the simple option?",roles:["tech","data"],
+  why:"Without a fair side-by-side comparison, you cannot tell whether training was worth it.",
+  watch:"Score both on the same test cases, with the same pass marks agreed before testing.",l:["starter"]}
+ ]
+},
+{
+ id:"datatools",tab:"Data in tools",title:"Decide what data may go into which tool",beyond:true,paths:["use"],
+ short:"Match each kind of data to an approved tool and check personal data",
+ intro:"Staff can paste almost anything into an assistant in seconds. This stage sets which tools are approved and what each may receive.",
+ ready:"You have a short list of approved tools and a rule for each kind of data.",
+ items:[
+ {id:"d1",q:"Which tools are approved, and which kinds of data may go into each?",roles:["biz","data","tech"],
+  why:"The same person might use a free chat app, a workplace plan and an API. Their data terms differ and change.",
+  watch:"Read the current data terms for the exact plan you are paying for, and note the date you checked. Sort data into a few classes (public, internal, confidential, personal) and say which tool takes which."},
+ {id:"d2",q:"Does the task involve personal data?",roles:["data","biz"],
+  why:"PDPC’s advisory guidelines aim to give clarity on using personal data to train or develop AI, on what to tell consumers when seeking consent, and on obligations of third-party AI developers.",
+  watch:"Leave personal data out or anonymise it where the task does not need it. Ask whoever handles PDPA compliance before you start.",l:["pdpc"]},
+ {id:"d3",q:"Could the tool reveal confidential information to someone who should not see it?",roles:["tech"],
+  why:"OWASP lists sensitive information disclosure (confidential or personal data revealed to other users or through crafted prompts) and system prompt leakage (sensitive data in instructions can be exposed). IMDA’s starter kit lists data leakage as a testing risk.",
+  watch:"Never put passwords, keys or private data in the instructions you give a tool.",l:["owasp","starter"]},
+ {id:"d4",q:"If you connect the tool to your documents, does it respect who may see what?",roles:["tech","data"],
+  why:"OWASP notes that flaws in how embeddings are generated, stored or retrieved can cause data leakage. A search tool that ignores file permissions can surface a document to someone who could not open it directly.",
+  watch:"Carry file permissions through, and test with an account that has few permissions.",l:["owasp"]},
+ {id:"d5",q:"Is the information you give it accurate, current and yours to use?",roles:["data"],
+  why:"The tool repeats what it is given. This extends the handbook’s data-quality questions to the documents you connect.",
+  watch:"Remove outdated policies and duplicates from any library you connect.",l:["imda"]}
+ ]
+},
+{
+ id:"eval",tab:"Test outputs",title:"Test outputs before relying on them",beyond:true,paths:["use"],
+ short:"Agree what good looks like, test on real cases, and keep testing",
+ intro:"Fluent output is not the same as correct output. IMDA’s starter kit gives a simple three-step pattern: identify the risks and pass marks, test, then assess and re-test.",
+ ready:"You have a small test set, agreed pass marks and a plan for re-testing.",
+ items:[
+ {id:"e1",q:"What does a good answer look like for this task, and what is the pass mark?",roles:["biz","tech"],
+  why:"The starter kit’s first step is to decide which risks apply, how much testing is needed and what thresholds count as a pass, before testing.",
+  watch:"Write the pass mark down first. Otherwise results get judged to fit.",l:["starter"]},
+ {id:"e2",q:"Have you built a small test set from real cases?",roles:["tech","data"],
+  why:"The starter kit describes output testing, which treats the app as a black box, with benchmarking and red teaming as the main methods and user simulation and pilots as supplements.",
+  watch:"Include normal cases, hard cases and cases where the right behaviour is to refuse or ask a person.",l:["starter"]},
+ {id:"e3",q:"Which failures matter most to you?",roles:["biz","tech"],
+  why:"The starter kit names five risk categories: hallucination and inaccuracy, bias in decision making, undesirable content, data leakage and vulnerability to adversarial prompts.",
+  watch:"Pick the two or three that would hurt your business most and test those first.",l:["starter"]},
+ {id:"e4",q:"Will you re-test when the model, instructions or documents change?",roles:["tech"],
+  why:"The starter kit treats testing as ongoing. Vendors also retire models: Anthropic says it gives at least 60 days’ notice before retiring a publicly released model and recommends testing on newer models well before the retirement date.",
+  watch:"Keep your test set so you can re-run it whenever something changes.",l:["starter","deprec"]},
+ {id:"e5",q:"Who reviews a sample of real outputs after launch?",roles:["biz"],
+  why:"Testing before launch cannot cover everything. Singapore’s generative AI framework also asks for incident management, meaning timely notification, remediation and ongoing improvement.",
+  watch:"Pick a regular time, such as weekly at first, to read a sample of real outputs and log problems.",l:["imda"]}
+ ]
+},
+{
+ id:"secure",tab:"Security",title:"Protect it from misuse",beyond:true,paths:["use"],
+ short:"Prompt injection, excessive permissions, unsafe outputs and unvetted add-ons",
+ intro:"AI tools bring their own security problems on top of ordinary ones. These come mainly from OWASP’s list of top risks for LLM applications and from the Cyber Security Agency of Singapore.",
+ ready:"The tool only has the access it needs, risky actions need a person, and someone has tried to break it.",
+ items:[
+ {id:"s1",q:"Could text the tool reads, such as an email, web page or file, give it instructions?",roles:["tech"],
+  why:"This is prompt injection, OWASP’s top LLM risk. Crafted inputs, directly or hidden in external content such as a web page the model summarises, can change what it does. OWASP says retrieval and fine-tuning do not fully prevent it.",
+  watch:"Treat anything the tool reads from outside as untrusted, and label it as untrusted in the setup.",l:["owaspPI","owasp"]},
+ {id:"s2",q:"Does the tool have only the access and abilities it needs?",roles:["tech"],
+  why:"OWASP’s mitigation list for prompt injection includes least privilege, running privileged functions in code rather than through the model, and requiring human approval for high-risk actions.",
+  watch:"Give the tool its own account with limited rights, never an administrator’s.",l:["owaspPI"]},
+ {id:"s3",q:"What happens to the output before other systems use it?",roles:["tech"],
+  why:"OWASP calls this improper output handling: accepting output without scrutiny can enable attacks such as cross-site scripting or remote code execution.",
+  watch:"Check outputs with fixed rules in code, especially when they feed a website or a database.",l:["owasp","owaspPI"]},
+ {id:"s4",q:"Who vetted the plug-ins, connectors and packages?",roles:["tech"],
+  why:"OWASP lists supply-chain risk: compromised models, unvetted packages and insecure plug-ins. CSA’s guidelines cover conventional threats such as supply chain attacks as well as AI-specific ones, and take a secure-by-design, secure-by-default approach.",
+  watch:"Keep a list of everything connected to your AI tools, with an owner for each.",l:["owasp","csa"]},
+ {id:"s5",q:"Is there a limit on how much any one user or process can use?",roles:["tech","biz"],
+  why:"OWASP lists unbounded consumption: excessive use of compute or API calls can cause outages and cost spikes.",
+  watch:"Set caps and alerts per person and per application.",l:["owasp"]},
+ {id:"s6",q:"Has someone tried to break it before launch?",roles:["tech"],
+  why:"OWASP recommends regular adversarial testing, treating the model as an untrusted user. IMDA’s starter kit names red teaming as a main method.",
+  watch:"Include attempts to extract instructions, bypass rules and get data they should not see.",l:["owaspPI","starter"]}
+ ]
+},
+{
+ id:"oversight",tab:"Oversight",title:"Keep people in charge",beyond:true,paths:["use","build"],
+ short:"Decide what a person must check, and make sure they can",
+ intro:"Human oversight only works when the reviewer has the time, knowledge and authority to disagree. This stage turns “a human will check it” into something you can actually run.",
+ ready:"You know which outputs need a person, who that is, and how they can stop or override the AI.",
+ items:[
+ {id:"o1",q:"Which outputs must a person check before they are used or sent?",roles:["biz"],
+  why:"IMDA’s agentic AI framework says humans are ultimately accountable, and OWASP recommends human approval for high-risk actions.",
+  watch:"Sort tasks into: AI drafts and a person approves; AI acts and a person reviews later; AI acts alone. Start every task at the first.",l:["agentic","owaspPI"]},
+ {id:"o2",q:"Can the reviewer genuinely judge the output, and do they have time to?",roles:["biz"],
+  why:"IMDA’s update to the agentic framework addresses automation bias, the habit of accepting machine output. In the 2025 DORA survey, 90% of software professionals use AI, yet only 24% trust it a great deal or a lot.",
+  watch:"A reviewer who cannot do the task, or is given seconds per item, is only a rubber stamp. Match reviewers to expertise and set a realistic volume.",l:["agentic","dora"]},
+ {id:"o3",q:"Do customers know when they are dealing with AI, and can they reach a person?",roles:["biz"],
+  why:"Singapore’s generative AI framework includes content provenance, which shows where content comes from. Air Canada was held responsible for what its chatbot said.",
+  watch:"Say clearly when AI is involved and give an easy route to a person.",l:["imda","aircan"]},
+ {id:"o4",q:"What is your plan when it gets something wrong?",roles:["biz","tech"],
+  why:"Mistakes will happen. The framework asks for an incident system that supports timely notification, remediation and ongoing improvement.",
+  watch:"Know who can switch the tool off, who talks to the affected person, and how the fix is tested.",l:["imda"]},
+ {id:"o5",q:"Can a person override the AI, pause it or switch it off?",roles:["tech"],
+  why:"This is the practical side of human oversight. A control that exists on paper but not in the system gives no protection.",
+  watch:"Test the off switch before launch."}
+ ]
+},
+{
+ id:"code",tab:"AI coding",title:"Build with AI coding assistants safely",beyond:true,paths:["use","build"],
+ short:"Specs, review, tests and ownership when Kiro, Copilot or similar write the code",
+ intro:"Assistants such as Kiro or Copilot can produce working software quickly. The risk is code nobody understands or owns. This applies to whoever builds, including non-engineers.",
+ ready:"Every piece of generated code has an owner, a review, and tests it must pass.",
+ items:[
+ {id:"k1",q:"Does someone who understands the code review everything the assistant writes?",roles:["tech"],
+  why:"The 2025 DORA report finds AI adoption is now linked to higher delivery throughput, but says the continuing challenge is making sure software works as intended before it reaches users. It describes AI as a mirror and a multiplier: it helps cohesive organisations and exposes weak spots in fragmented ones.",
+  watch:"No merge without a human reviewer who could have written it.",l:["dora"]},
+ {id:"k2",q:"Is there a written spec before the assistant starts?",roles:["tech","biz"],
+  why:"Kiro’s spec-driven approach moves each feature through requirements (user stories and acceptance criteria), design (architecture, data flow, error handling, testing strategy) and tasks (discrete, trackable steps).",
+  watch:"Even with another tool, write down what done means before generating code.",l:["kiro"]},
+ {id:"k3",q:"Are there automated tests the generated code must pass?",roles:["tech"],
+  why:"Tests turn “it looks right” into evidence. DORA’s finding that AI exposes weaknesses in fragmented organisations applies strongly to missing tests.",
+  watch:"Ask the assistant for tests, then check that the tests actually test something.",l:["dora"]},
+ {id:"k4",q:"Who owns and can maintain this code later?",roles:["biz","tech"],
+  why:"Fast code still counts as technical debt if nobody can change it safely. The handbook’s warning about shortcuts applies even more when the author is a tool.",
+  watch:"Name an owner, keep generated code in version control, and require a short explanation of how it works.",src:"§1.4"},
+ {id:"k5",q:"Are secrets, customer data and licensed code kept out of prompts and repositories?",roles:["tech"],
+  why:"Anything pasted into an assistant is sent to a service. OWASP lists sensitive information disclosure as a top LLM risk.",
+  watch:"Use environment variables for keys, and check what each assistant plan does with your code.",l:["owasp"]},
+ {id:"k6",q:"Are non-engineers building tools with AI, and who checks those?",roles:["biz"],
+  why:"A working prototype from a business user can quietly become a business-critical tool with no review, backup or owner.",
+  watch:"Let people prototype freely, but require a review before anything holds customer data or becomes part of daily operations."}
+ ]
+},
+{
+ id:"cost",tab:"Cost & vendor",title:"Plan for cost and vendor dependency",beyond:true,paths:["use","build"],
+ short:"Usage-based bills, models that change or retire, and a way out",
+ intro:"Most AI services are billed by use, and vendors change or retire models. Plan for both so a price rise or a retired model is an inconvenience, not a crisis.",
+ ready:"You know your likely spend at higher volume, what happens when a model changes, and how you could move.",
+ items:[
+ {id:"v1",q:"What will this cost at ten times today’s use?",roles:["biz"],
+  why:"Usage-based billing can grow quickly. OWASP lists unbounded consumption, which can cause cost spikes, as a top LLM risk.",
+  watch:"Estimate cost per task, multiply by realistic volume, and set budget caps and alerts.",l:["owasp"]},
+ {id:"v2",q:"What happens when the vendor changes or retires the model you use?",roles:["tech"],
+  why:"Anthropic’s policy gives at least 60 days’ notice before retiring a publicly released model, warns that deprecated models are likely to be less reliable, and recommends testing newer models well before the retirement date. It also notes that cloud partners such as Amazon Bedrock and Google Cloud set their own schedules. Other vendors have their own policies.",
+  watch:"Find your vendor’s deprecation policy and put the retirement dates in a calendar. Re-run your test set on the replacement.",l:["deprec"]},
+ {id:"v3",q:"Could you switch to another vendor if you had to?",roles:["tech","biz"],
+  why:"Lock-in builds up quietly through special features, saved instructions and data held on the vendor’s side.",
+  watch:"Keep your instructions, test set and documents in your own storage, and avoid vendor-specific features unless they clearly earn their place."},
+ {id:"v4",q:"Who watches the bill and the usage?",roles:["biz","data"],
+  why:"Without an owner, spend grows unnoticed. Some vendors let you export usage by key and model; Anthropic’s Console does.",
+  watch:"Give each project its own key or account, and review usage monthly.",l:["deprec"]},
+ {id:"v5",q:"Are you paying for several tools that overlap?",roles:["biz"],
+  why:"With so many assistants available, teams often end up with several overlapping subscriptions.",
+  watch:"Review seats every quarter and keep what is used."}
+ ]
+},
+{
+ id:"gov",tab:"Governance",title:"Set simple rules and accountability",beyond:true,paths:["use","build"],
+ short:"An acceptable-use policy, named owners, a register and an eye on guidance",
+ intro:"You do not need a heavy programme. A few clear rules, named owners and a regular review cover most of what a small company needs.",
+ ready:"There is a short policy, a named owner for each AI use, and a date to review both.",
+ items:[
+ {id:"r1",q:"Is there a short acceptable-use policy that staff have read?",roles:["biz"],
+  why:"Staff are already using these tools. A plain policy tells them which tools, which data and which tasks are fine.",
+  watch:"One page is enough. Cover approved tools, data rules, who to ask, and what to do after a mistake."},
+ {id:"r2",q:"How will you handle staff using unapproved tools (“shadow AI”)?",roles:["biz"],
+  why:"Banning tools rarely stops use; it moves it out of sight.",
+  watch:"Ask what people already use, approve what you can, and make the approved route easier than the workaround."},
+ {id:"r3",q:"Is there a named owner for each AI use?",roles:["biz"],
+  why:"Singapore’s generative AI framework puts accountability first, and IMDA’s agentic framework states that humans are ultimately accountable.",
+  watch:"Each use has one owner who can explain it, pause it and report on it.",l:["imda","agentic"]},
+ {id:"r4",q:"Do you keep a simple list of AI uses, with risk and owner?",roles:["biz","tech"],
+  why:"You cannot manage what you cannot see. ISO/IEC 42001 is a management-system standard for organisations of any size that develop, provide or use AI. NIST’s generative AI profile is a voluntary companion to its AI Risk Management Framework.",
+  watch:"You do not need certification. Use these as checklists for what a lightweight system covers, then keep it proportionate to your size.",l:["iso","nist"]},
+ {id:"r5",q:"Do you know which local guidance applies to you?",roles:["biz","tech"],
+  why:"Singapore has guidance from IMDA (generative AI, agentic AI), PDPC (personal data in AI systems) and CSA (securing AI systems). These are guidelines, not a substitute for legal advice.",
+  watch:"Assign one person to read the summaries and flag what applies.",l:["imda","agentic","pdpc","csa"]},
+ {id:"r6",q:"When will you next review these rules?",roles:["biz"],
+  why:"The guidance itself keeps moving: CSA says it will update its documents as the field evolves, and IMDA issued an updated agentic framework in May 2026.",
+  watch:"Put a review in the calendar every six months, and after any incident.",l:["csa","agentic"]}
+ ]
+}
+];
+
+
+var PATHS_OF={frame:["use","build"],data:["use","build"],ready:["use","build"],handover:["use","build"],store:["build"],good:["build"],deploy:["build"]};
+var ORDER=["frame","fit","custom","data","datatools","ready","store","good","eval","secure","oversight","code","cost","gov","deploy","handover"];
+var BYID={};
+HB_STAGES.concat(GEN_STAGES).forEach(function(s){BYID[s.id]=s;if(PATHS_OF[s.id])s.paths=PATHS_OF[s.id]});
+var STAGES=ORDER.map(function(id){return BYID[id]});
+
+var GLOSS=[
+{t:"Target (or label)",d:"The thing you want the AI to predict, and the recorded correct answers for past cases.",s:"§1.3"},
+{t:"Feature",d:"A piece of information the model uses to make its prediction, such as a transaction amount.",s:"§1.3"},
+{t:"Training and test data",d:"Training data teaches the model. Test data is held back to check, fairly, how it performs on cases it has not seen.",s:"§5.5"},
+{t:"Inference",d:"Using a trained model to produce an answer on new data.",s:"§6.6"},
+{t:"Model drift",d:"The model getting less accurate over time because real-world data changes from what it was trained on.",s:"§1.5, §2.5"},
+{t:"Retraining",d:"Refreshing a model with new data so it keeps performing.",s:"§2.5"},
+{t:"Precision and recall",d:"Precision: of everything the model flagged, how much was right. Recall: of all real cases, how many the model found.",s:"§6.5"},
+{t:"F1 score",d:"A single number that balances precision and recall.",s:"§6.5"},
+{t:"Imbalanced data",d:"Data where one outcome is far rarer than the others, such as 5% fraud and 95% normal.",s:"§6.5"},
+{t:"Data leakage",d:"The model gets information in training that it won’t have in real use, so test results look better than reality.",s:"§5.7"},
+{t:"Out-of-distribution data",d:"Data that differs from the training data but could still turn up in real use.",s:"§6.4"},
+{t:"Glass-box and black-box models",d:"Glass-box models can be read directly and explain themselves exactly. Black-box models are more powerful but need extra analysis, and the explanations are approximate.",s:"§6.11"},
+{t:"Data warehouse and data lake",d:"A warehouse is a central, standardised store. A lake holds raw data from many sources before it is processed into warehouses.",s:"§5.2"},
+{t:"API",d:"A standard way for two software systems to send requests and responses to each other.",s:"§7.2.4"},
+{t:"Staging (test) environment",d:"A test copy of the live setup, used to try the solution before going live.",s:"§7.2.1"},
+{t:"Container (Docker)",d:"A way of packaging software with what it depends on, so it runs the same way in different places.",s:"§5.9.4, §7.2.1"},
+{t:"CI/CD and MLOps",d:"Automation that tests, packages and releases the AI system reliably, and keeps it running.",s:"§5.9, §7.3"},
+{t:"Pipeline",d:"The chain of steps from raw data to a delivered result.",s:"§1.4, §5.8"},
+{t:"Technical debt",d:"Shortcuts taken to build faster that make later changes more expensive, like interest on a loan.",s:"§1.4"},
+{t:"Reproducibility",d:"Getting the same model again from the same code and data.",s:"§6.3"},
+{t:"Edge deployment",d:"Running the model on a small device on site rather than on a central server.",s:"§4.2.1"},
+{t:"Data poisoning",d:"Deliberate tampering with training data to make the model fail.",s:"§5.10"},
+{t:"LLM (large language model)",d:"An AI model trained on very large amounts of text that can write, summarise, answer questions and write code. Claude, ChatGPT and Copilot are built on LLMs.",b:1},
+{t:"Prompt and system prompt",d:"A prompt is what you ask the tool. A system prompt is the standing instructions set by whoever configures it.",b:1},
+{t:"Hallucination",d:"A confident-sounding answer that is wrong or made up.",b:1},
+{t:"Prompt injection",d:"Text, typed or hidden in a document or web page, that tricks an AI tool into following instructions it should not.",b:1},
+{t:"Retrieval (RAG)",d:"Having the tool look up your own documents at question time and answer from them, rather than retraining the model.",b:1},
+{t:"Fine-tuning",d:"Further training a model on your own examples to change how it behaves.",b:1},
+{t:"AI agent",d:"An AI tool that can take actions, such as sending messages or updating records, not just write text.",b:1},
+{t:"Excessive agency",d:"Giving an AI tool more permissions or autonomy than it needs, so one bad output can do real damage.",b:1},
+{t:"Human in the loop",d:"A person reviews or approves the AI’s output or action before it takes effect.",b:1},
+{t:"Automation bias",d:"The tendency to accept a machine’s answer without checking it properly.",b:1},
+{t:"Shadow AI",d:"Staff using AI tools that the organisation has not approved or does not know about.",b:1},
+{t:"Token and usage-based pricing",d:"Tokens are the small pieces of text a model reads and writes. Many services charge by how many you use.",b:1},
+{t:"Model deprecation and retirement",d:"A vendor announces that a model will be replaced and later switched off. Prompts that worked well may need re-testing on the replacement.",b:1},
+{t:"Spec-driven development",d:"Writing down requirements, design and tasks first, then having an AI assistant build from them. Kiro works this way.",b:1}
+];
+
+/* ---------- state ---------- */
+var LS_P="aiguide-progress-v1",LS_R="aiguide-role-v1",LS_V="aiguide-view-v2";
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+var ITEMS=[];
+STAGES.forEach(function(s,si){s.items.forEach(function(it,ii){ITEMS.push({s:s,si:si,it:it,ii:ii})})});
+
+var progress={},drafts={},openItems={},role="all",view="start",gq="",pathLocal=null;
+var db=null,user=null,uid=null,readOnly=false,mode="local";
+var timers={},queues={},toastTimer=null;
+
+try{progress=JSON.parse(lsGet(LS_P)||"{}")||{}}catch(e){progress={}}
+var r0=lsGet(LS_R);if(r0&&ROLES[r0])role=r0;
+var v0=lsGet(LS_V);if(v0==="start"||v0==="help"||/^stage:\d+$/.test(v0||""))view=v0;
+
+function curPath(){
+  if(readOnly&&pathLocal)return pathLocal;
+  var p=progress.pathchoice&&progress.pathchoice.path;
+  if(p==="use"||p==="build"||p==="both")return p;
+  return pathLocal;
+}
+function inPath(s){var p=curPath();if(!p)return false;return p==="both"||s.paths.indexOf(p)>-1}
+function activeIdx(){var a=[];STAGES.forEach(function(s,i){if(inPath(s))a.push(i)});return a}
+function activeItems(){return ITEMS.filter(function(x){return inPath(x.s)})}
+function stageNo(si){return activeIdx().indexOf(si)+1}
+function stat(id){var p=progress[id];return p&&p.status?p.status:"open"}
+function totals(){var d=0,h=0,n=0;activeItems().forEach(function(x){n++;var s=stat(x.it.id);if(s==="done")d++;else if(s==="help")h++});return{d:d,h:h,n:n}}
+function counts(s){var d=0,h=0;s.items.forEach(function(it){var t=stat(it.id);if(t==="done")d++;else if(t==="help")h++});return{d:d,h:h,n:s.items.length}}
+function visible(it){return role==="all"||it.roles.indexOf(role)>-1}
+function stageIndex(){var m=/^stage:(\d+)$/.exec(view);return m?+m[1]:-1}
+function fmtDate(iso){try{return new Date(iso).toLocaleDateString(undefined,{day:"numeric",month:"short"})}catch(e){return ""}}
+function pathLabel(s){
+  if(s.paths.length>1)return "Both paths";
+  return s.paths[0]==="use"?"Using existing tools":"Building a custom model";
+}
+
+/* ---------- saving ---------- */
+function toast(msg){
+  var t=document.getElementById("toast");t.textContent=msg;t.hidden=false;
+  clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.hidden=true},4500);
+}
+function resync(){
+  if(!db)return;
+  db.collection("progress").get().then(function(snap){
+    var m={};snap.docs.forEach(function(d){m[d.id]=d.data()});progress=m;render();
+  }).catch(function(){});
+}
+function writeFailed(e){
+  var code=e&&e.code;
+  if(code==="invalid_argument"){
+    readOnly=true;
+    toast("View only: ask the owner for Contributor access to record progress.");
+  }else{
+    toast("That change could not be saved. Please try again.");
+  }
+  resync();
+}
+function save(id,patch){
+  var cur=progress[id]||{};
+  var next={status:cur.status||"open",note:cur.note||"",by:uid||null,at:new Date().toISOString()};
+  for(var k in patch)next[k]=patch[k];
+  progress[id]=next;
+  if(db&&mode==="live"){
+    queues[id]=(queues[id]||Promise.resolve()).then(function(){return db.doc("progress/"+id).set(next)}).catch(writeFailed);
+  }else{
+    lsSet(LS_P,JSON.stringify(progress));
+  }
+}
+function flushNote(id){
+  clearTimeout(timers[id]);
+  if(drafts[id]===undefined)return;
+  var val=drafts[id];delete drafts[id];
+  var prev=(progress[id]&&progress[id].note)||"";
+  if(prev===val)return;
+  save(id,{note:val});
+}
+function flushAll(){Object.keys(drafts).forEach(flushNote)}
+function setPath(p){
+  pathLocal=p;
+  if(readOnly)return;
+  var next={path:p,by:uid||null,at:new Date().toISOString()};
+  progress.pathchoice=next;
+  if(db&&mode==="live"){
+    queues.pathchoice=(queues.pathchoice||Promise.resolve()).then(function(){return db.doc("progress/pathchoice").set(next)}).catch(writeFailed);
+  }else{
+    lsSet(LS_P,JSON.stringify(progress));
+  }
+}
+
+/* ---------- rendering ---------- */
+function renderMasthead(){
+  var t=totals();var pct=t.n?Math.round(t.d/t.n*100):0;
+  var label=readOnly?"View only":(mode==="live"?"Shared with your team":"Saved on this device only");
+  var pillCls=mode==="live"&&!readOnly?"pill":"pill local";
+  document.getElementById("masthead").innerHTML=
+    '<p class="kicker">From the AI Singapore AI Practitioner Handbook, extended for generative AI</p>'+
+    '<h1>First AI Project Guide</h1>'+
+    '<p class="sub">A step-by-step checklist and help file for organisations starting their first AI project, whether you use tools like Claude, ChatGPT and Copilot or build your own model.</p>'+
+    (t.n?'<div class="prog"><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="'+t.n+'" aria-valuenow="'+t.d+'" aria-label="Items done"><i style="width:'+pct+'%"></i></div>'+
+    '<p><b>'+t.d+' of '+t.n+'</b> done'+(t.h?' · <b>'+t.h+'</b> need help':'')+'</p></div>':'')+
+    '<div class="toprow"><div class="tnav">'+
+    '<button class="hlink" data-act="go" data-view="start"'+(view==="start"?' aria-current="page"':'')+'>Overview</button>'+
+    '<button class="hlink" data-act="go" data-view="help"'+(view==="help"?' aria-current="page"':'')+'>Help &amp; glossary</button>'+
+    '</div><span class="'+pillCls+'">'+label+'</span></div>';
+}
+function renderStepper(){
+  var cur=stageIndex();var act=activeIdx();
+  var nav=document.querySelector(".stepper");nav.hidden=!act.length;
+  var ol=document.getElementById("stepper");
+  ol.innerHTML=act.map(function(i,k){
+    var s=STAGES[i];var c=counts(s);var p=Math.round(c.d/c.n*100);
+    var cls="step"+(c.d===c.n?" done":"");
+    return '<li><button class="'+cls+'" data-act="go" data-view="stage:'+i+'"'+(cur===i?' aria-current="step"':'')+' aria-label="Stage '+(k+1)+': '+esc(s.title)+', '+c.d+' of '+c.n+' done">'+
+      '<span class="dot" style="--p:'+p+'%"><b>'+(c.d===c.n?"✓":(k+1))+'</b></span><span class="lbl">'+esc(s.tab)+'</span></button></li>';
+  }).join("");
+  var c2=ol.querySelector('[aria-current="step"]');
+  if(c2){var li=c2.parentNode;ol.scrollLeft=Math.max(0,li.offsetLeft-ol.offsetLeft-(ol.clientWidth-li.offsetWidth)/2)}
+}
+function roleChips(){
+  var all=[["all","Everyone"],["biz",ROLES.biz],["data",ROLES.data],["tech",ROLES.tech]];
+  return '<div class="chips" role="group" aria-label="Role">'+all.map(function(r){
+    return '<button class="chip" data-act="role" data-role="'+r[0]+'" aria-pressed="'+(role===r[0])+'">'+r[1]+'</button>';
+  }).join("")+'</div>';
+}
+function nextStageIdx(){
+  var act=activeIdx();
+  for(var k=0;k<act.length;k++){var c=counts(STAGES[act[k]]);if(c.d<c.n)return act[k]}
+  return -1;
+}
+function pathCards(){
+  var opts=[
+   ["use","Use or configure existing AI tools","Claude, ChatGPT, Copilot, Kiro and similar. Choosing tasks, deciding what data goes in, checking outputs, setting rules."],
+   ["build","Build or train a custom model","Your own model, trained or fine-tuned on your data. The handbook’s full path, plus today’s generative AI considerations."],
+   ["both","Both","Everything on both paths. Shared stages appear once."]];
+  var cp=curPath();
+  return '<div class="paths" role="group" aria-label="Project path">'+opts.map(function(o){
+    return '<button class="pathcard" data-act="path" data-path="'+o[0]+'" aria-pressed="'+(cp===o[0])+'"><span class="t">'+o[1]+'</span><span class="s">'+o[2]+'</span></button>';
+  }).join("")+'</div>';
+}
+function startView(){
+  var h='';
+  var cp=curPath();
+  if(!cp){
+    h+='<section><p class="eyebrow">Start here</p><h2>What is your project?</h2>'+
+      '<p class="lead">Pick the path that fits. Each path shows its own stages, plus the shared ones such as data, readiness and handover. You can change the path later and nothing already saved is lost.</p>'+pathCards()+'</section>';
+    h+='<section class="box"><h3>How to read this guide</h3><p style="margin-top:8px">The handbook-based stages come from AI Singapore’s AI Practitioner Handbook (2023). The stages and items tagged <b>Beyond the handbook</b> add current thinking on generative AI, with a link to the public source behind each one. It is meant to start conversations. It is not an assessment or legal advice, and finishing the checklist does not guarantee a project will succeed.</p></section>';
+    return h;
+  }
+  var t=totals();var nx=nextStageIdx();
+  var started=t.d>0||t.h>0;
+  var act=activeIdx();
+  var cta=nx<0?'<p><b>Every item is marked done.</b> Revisit any stage from the list below.</p>':
+    '<button class="btn" data-act="go" data-view="stage:'+nx+'">'+(started?"Continue at stage "+stageNo(nx):"Start at stage 1")+'</button>';
+  var flagged=activeItems().filter(function(x){return stat(x.it.id)==="help"});
+  h+='<section><p class="eyebrow">Overview</p><h2>'+act.length+' stages, one at a time</h2>'+
+    '<p class="lead">Each item is a question your team should be able to answer before moving on. Mark it <b>Done</b>, or flag <b>Need help</b> to come back to it, and leave notes as you go. When this page is shared with your team, progress and notes are saved for everyone.</p></section>';
+  h+='<section class="box"><h3>Your path</h3><p class="muted" style="margin:6px 0 0">Switching paths changes which stages you see. Progress is kept.</p>'+pathCards()+'</section>';
+  h+='<section class="box"><h3>Who is answering?</h3><p class="muted" style="margin:6px 0 12px">Pick a role to see the questions most relevant to you. Nothing is lost when you switch; the other questions are just hidden.</p>'+roleChips()+'</section>';
+  h+='<section>'+cta+'</section>';
+  h+='<section><h2>The stages</h2><ol class="stage-list">'+act.map(function(i,k){
+    var s=STAGES[i];var c=counts(s);var p=Math.round(c.d/c.n*100);
+    return '<li><button class="srow'+(c.d===c.n?" done":"")+'" data-act="go" data-view="stage:'+i+'">'+
+      '<span class="n">'+(c.d===c.n?"✓":(k+1))+'</span><span class="t">'+esc(s.title)+'</span>'+
+      '<span class="s">'+esc(s.short)+'</span>'+
+      '<span><span class="chips" style="margin-bottom:6px">'+(s.beyond?'<span class="tag bey">Beyond the handbook</span>':'')+'<span class="tag">'+pathLabel(s)+'</span></span>'+
+      '<span class="mini"><i style="width:'+p+'%"></i></span><span class="cnt">'+c.d+' of '+c.n+' done'+(c.h?' · '+c.h+' need help':'')+'</span></span></button></li>';
+  }).join("")+'</ol></section>';
+  if(flagged.length){
+    h+='<section><h2>Needs help</h2><p class="muted" style="margin-top:6px">Items someone on your team has flagged.</p><div class="helplist">'+flagged.map(function(x){
+      return '<button class="hl" data-act="goitem" data-stage="'+x.si+'" data-id="'+x.it.id+'"><span>'+esc(x.it.q)+'</span><span class="cnt">'+stageNo(x.si)+'.'+(x.ii+1)+'</span></button>';
+    }).join("")+'</div></section>';
+  }
+  h+='<section class="box"><h3>How to read this guide</h3><p style="margin-top:8px">Stages built from AI Singapore’s handbook are written for teams training their own models. If you are using existing tools, skip a question that clearly assumes you are training a model and note why. Stages and items tagged <b>Beyond the handbook</b> cover generative AI and link to the public sources they draw on. This guide is meant to start conversations. It is not an assessment or legal advice, and finishing the checklist does not guarantee a project will succeed. For a formal view of your organisation’s readiness, see AI Singapore’s AI Readiness Index (AIRI).</p></section>';
+  return h;
+}
+function sourcesHTML(it){
+  var ls=(it.l||[]).map(function(k){return SRC[k]}).filter(Boolean);
+  if(!ls.length)return '<p class="meta">Practical suggestion; no single published source.</p>';
+  return '<div class="block"><h4>Sources</h4><ul class="plain srcs">'+ls.map(function(s){
+    return '<li><a href="'+esc(s.u)+'" target="_blank" rel="noopener">'+esc(s.t)+'</a></li>';
+  }).join("")+'</ul></div>';
+}
+function itemHTML(si,ii,it){
+  var p=progress[it.id]||{};var st=stat(it.id);
+  var note=drafts[it.id]!==undefined?drafts[it.id]:(p.note||"");
+  var num=stageNo(si)+"."+(ii+1);
+  var beyond=!!STAGES[si].beyond;
+  var dis=readOnly?" disabled":"";
+  var seg=[["open","Not yet"],["done","Done"],["help","Need help"]].map(function(o){
+    return '<button id="b-'+it.id+'-'+o[0]+'" data-act="status" data-id="'+it.id+'" data-v="'+o[0]+'" aria-pressed="'+(st===o[0])+'"'+dis+'>'+o[1]+'</button>';
+  }).join("");
+  var tags=(beyond?'<span class="tag bey">Beyond the handbook</span>':'')+it.roles.map(function(r){return '<span class="tag'+(role===r?" on":"")+'">'+ROLES[r]+'</span>'}).join("");
+  var meta=p.at?'<p class="meta">Last change '+esc(fmtDate(p.at))+(p.by?' by <span data-by="'+esc(p.by)+'">a teammate</span>':"")+'</p>':"";
+  return '<article class="item" id="item-'+it.id+'" data-s="'+st+'">'+
+    '<div class="q"><span class="idx">'+num+'</span><h3>'+it.q+'</h3></div>'+
+    '<div class="chips">'+tags+'</div>'+
+    '<div class="seg" role="group" aria-label="Status of '+num+'">'+seg+'</div>'+
+    '<details data-id="'+it.id+'"'+(openItems[it.id]?" open":"")+'><summary>Why it matters and what to look out for'+(note?' <span class="dotnote" title="Has a note"></span>':"")+'</summary><div class="body">'+
+    '<p>'+it.why+'</p>'+
+    (it.watch?'<div class="block"><h4>Look out for</h4><p>'+it.watch+'</p></div>':"")+
+    (it.tech?'<div class="block"><h4>Technical note</h4><p>'+it.tech+'</p></div>':"")+
+    (beyond?sourcesHTML(it)+(it.src?'<p class="meta">Builds on handbook '+it.src+'</p>':''):'<p class="meta">Handbook '+it.src+'</p>')+
+    '<div><label for="note-'+it.id+'">Team notes</label><textarea id="note-'+it.id+'" data-note="'+it.id+'" rows="3" placeholder="Your answer, who owns it, or the next step"'+(readOnly?" readonly":"")+'>'+esc(note)+'</textarea></div>'+
+    meta+'</div></details></article>';
+}
+function stageView(i){
+  var s=STAGES[i];var act=activeIdx();var pos=act.indexOf(i);
+  var vis=s.items.filter(visible);var hidden=s.items.length-vis.length;
+  var h='<section><p class="eyebrow">Stage '+(pos+1)+' of '+act.length+' · '+pathLabel(s)+'</p><h2>'+esc(s.title)+'</h2>'+
+    (s.beyond?'<p style="margin-top:8px"><span class="tag bey">Beyond the handbook</span></p>':'')+
+    '<p class="lead">'+s.intro+'</p>'+
+    (s.note?'<p class="note-box">'+s.note+'</p>':"")+
+    '<p class="ready"><b>Ready to move on when:</b> '+s.ready+'</p>'+(s.beyond?'':'<p class="srcline">Handbook '+s.src+'</p>')+'</section>';
+  if(role!=="all"){
+    h+='<div class="rolebar"><span>Showing questions for <b>'+ROLES[role]+'</b>'+(hidden?' · '+hidden+' for other roles hidden':"")+'</span><button class="linkbtn" data-act="role" data-role="all">Show everyone’s</button></div>';
+  }
+  if(!vis.length){
+    h+='<div class="box">No questions in this stage are tagged for this role. Switch to Everyone to see them all.</div>';
+  }else{
+    h+='<div class="items">'+s.items.map(function(it,ii){return visible(it)?itemHTML(i,ii,it):""}).join("")+'</div>';
+  }
+  var prevV=pos<=0?"start":"stage:"+act[pos-1];
+  var prevL=pos<=0?"Overview":STAGES[act[pos-1]].title;
+  var last=pos>=act.length-1;
+  var nextV=last?"start":"stage:"+act[pos+1];
+  var nextL=last?"Back to overview":"Next: "+STAGES[act[pos+1]].title;
+  h+='<div class="pager"><button class="btn ghost" data-act="go" data-view="'+prevV+'">← '+esc(prevL)+'</button><button class="btn" data-act="go" data-view="'+nextV+'">'+esc(nextL)+' →</button></div>';
+  return h;
+}
+function helpView(){
+  var q=gq.trim().toLowerCase();
+  var list=GLOSS.filter(function(g){return !q||g.t.toLowerCase().indexOf(q)>-1||g.d.toLowerCase().indexOf(q)>-1});
+  var h='<section><p class="eyebrow">Help</p><h2>How to use this guide</h2>'+
+    '<ul class="plain"><li>Choose your path on the overview: use existing AI tools, build a custom model, or both. Work through the stages in order. Each question has a short explanation, what to look out for and, where relevant, a technical note for your tech team or vendor.</li>'+
+    '<li>Items tagged <b>Beyond the handbook</b> go past the 2023 handbook to cover generative AI. Open one to see the public sources behind it. Where no source is listed, it is a practical suggestion.</li>'+
+    '<li>Mark each item <b>Done</b> or <b>Need help</b>. Tap the same button again to reset it. Flagged items collect on the overview.</li>'+
+    '<li>Use the notes box to record the answer, who owns it, or the next step.</li>'+
+    '<li>Questions tagged with more than one role need a joint answer.</li></ul></section>';
+  h+='<section class="box"><h3>The three roles</h3><dl>'+
+    '<div><dt>'+ROLES.biz+'</dt><dd>The sponsor or manager who owns the problem and signs off decisions.</dd></div>'+
+    '<div><dt>'+ROLES.data+'</dt><dd>Whoever looks after the data and the systems it sits in, such as an analyst or operations lead.</dd></div>'+
+    '<div><dt>'+ROLES.tech+'</dt><dd>Your IT lead or engineer, or the vendor’s technical contact.</dd></div></dl>'+
+    '<div style="margin-top:14px">'+roleChips()+'</div></section>';
+  h+='<section><h2>Glossary</h2><p class="muted" style="margin-top:6px">Plain-language definitions written for this guide. Handbook terms show the section where each idea appears.</p>'+
+    '<input id="gloss-q" class="search" type="search" placeholder="Search terms" aria-label="Search glossary" value="'+esc(gq)+'">'+
+    '<dl>'+(list.length?list.map(function(g){return '<div><dt>'+esc(g.t)+'</dt><dd>'+esc(g.d)+'<span class="meta">'+(g.b?'Beyond the handbook':'Handbook '+esc(g.s))+'</span></dd></div>'}).join(""):'<p class="muted">No matching terms.</p>')+'</dl></section>';
+  h+='<section class="box"><h3>About this guide</h3><p style="margin-top:8px">Built from AI Singapore’s AI Practitioner Handbook (24 March 2023), which was written for AI engineers. The handbook stages keep the parts that help a first-time project team make decisions: framing the problem, data, readiness, storage, success measures, deployment and handover. They leave out engineering detail such as data-split mechanics, computer-vision metrics and CI/CD set-up. The stages tagged Beyond the handbook add generative AI considerations: use-case fit, data in tools, testing outputs, security, human oversight, AI-assisted coding, cost and vendor dependency, and governance. They draw on IMDA, PDPC and CSA guidance from Singapore, OWASP, NIST, ISO/IEC 42001, DORA and vendor documentation, checked on 20 October 2026. Some sources were read only in summary or in part, so open the linked source before relying on a detail. Where a point is simplified from the handbook, check the section named beside it.</p></section>';
+  return h;
+}
+function renderMain(){
+  var main=document.getElementById("main");
+  var i=stageIndex();
+  if(i>=0&&activeIdx().indexOf(i)<0){view="start";i=-1}
+  main.innerHTML=view==="help"?helpView():(i>=0?stageView(i):startView());
+}
+function render(){
+  var ae=document.activeElement;
+  var main=document.getElementById("main");
+  var fid=ae&&ae.id&&main.contains(ae)?ae.id:null;
+  var sel=null;
+  if(fid&&typeof ae.selectionStart==="number")sel=[ae.selectionStart,ae.selectionEnd];
+  renderMasthead();renderStepper();renderMain();
+  if(fid){
+    var el=document.getElementById(fid);
+    if(el){try{el.focus({preventScroll:true});if(sel&&el.setSelectionRange)el.setSelectionRange(sel[0],sel[1])}catch(e){}}
+  }
+  resolveNames();
+}
+function resolveNames(){
+  if(!user||!user.profiles)return;
+  var spans=document.querySelectorAll("[data-by]");
+  if(!spans.length)return;
+  var ids=[];spans.forEach(function(s){var id=s.getAttribute("data-by");if(id&&ids.indexOf(id)<0)ids.push(id)});
+  user.profiles(ids).then(function(ps){
+    spans.forEach(function(s){
+      var p=ps[s.getAttribute("data-by")];
+      if(p)s.textContent=p.isMe?"you":(p.name||"a teammate");
+    });
+  }).catch(function(){});
+}
+
+/* ---------- navigation and events ---------- */
+function go(v){
+  flushAll();view=v;lsSet(LS_V,v);render();window.scrollTo(0,0);
+}
+var app=document.getElementById("app");
+app.addEventListener("click",function(e){
+  var b=e.target.closest("[data-act]");if(!b)return;
+  var act=b.getAttribute("data-act");
+  if(act==="go"){go(b.getAttribute("data-view"))}
+  else if(act==="path"){setPath(b.getAttribute("data-path"));render()}
+  else if(act==="role"){role=b.getAttribute("data-role");lsSet(LS_R,role);render()}
+  else if(act==="status"){
+    if(readOnly)return;
+    var id=b.getAttribute("data-id"),v=b.getAttribute("data-v");
+    var next=v==="open"?"open":(stat(id)===v?"open":v);
+    save(id,{status:next});render();
+  }
+  else if(act==="goitem"){
+    var si=+b.getAttribute("data-stage"),iid=b.getAttribute("data-id");
+    openItems[iid]=true;go("stage:"+si);
+    var el=document.getElementById("item-"+iid);
+    if(el)el.scrollIntoView({block:"center"});
+  }
+});
+var mainEl=document.getElementById("main");
+mainEl.addEventListener("toggle",function(e){
+  var d=e.target;if(!d||!d.getAttribute)return;
+  var id=d.getAttribute("data-id");if(!id)return;
+  if(d.open)openItems[id]=true;else delete openItems[id];
+},true);
+mainEl.addEventListener("input",function(e){
+  var t=e.target;
+  if(t.id==="gloss-q"){gq=t.value;render();return}
+  var id=t.getAttribute&&t.getAttribute("data-note");
+  if(id){
+    drafts[id]=t.value;clearTimeout(timers[id]);
+    timers[id]=setTimeout(function(){flushNote(id)},900);
+  }
+});
+mainEl.addEventListener("focusout",function(e){
+  var id=e.target.getAttribute&&e.target.getAttribute("data-note");
+  if(id)flushNote(id);
+});
+window.addEventListener("pagehide",flushAll);
+
+/* ---------- shared progress ---------- */
+async function connect(){
+  try{
+    var c=window.claude;if(!c||!c.use)return;
+    user=await c.use("user");
+    if(user){
+      try{uid=await user.id()}catch(e){}
+      try{var w=await user.can("data.write");if(w===false)readOnly=true}catch(e){}
+    }
+    var d=await c.use("db");
+    if(!d){render();return}
+    db=d;mode="live";
+    db.collection("progress").onSnapshot(function(snap){
+      var m={};snap.docs.forEach(function(x){m[x.id]=x.data()});
+      progress=m;render();
+    },function(err){
+      db=null;mode="local";
+      try{progress=JSON.parse(lsGet(LS_P)||"{}")||{}}catch(e){progress={}}
+      toast("Live sharing stopped. Progress will be kept on this device only.");
+      render();
+    });
+  }catch(e){render()}
+}
+
+render();
+connect();
+})();
+</script>
